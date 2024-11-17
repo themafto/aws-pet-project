@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - backendrds
+      - backendredis
+
+  backendrds:
+    build: ./backend_rds
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+    env_file:
+      - .env
+  backendredis:
+    build: ./backend_redis
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
