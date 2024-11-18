@@ -11,6 +11,7 @@ jobs:
     env:
       CLUSTER_NAME: project2-v1
       REDIS_SERVICE_NAME: redis
+      AWS_REGION: eu-central-1
 
     steps:
       - name: Checkout Code
