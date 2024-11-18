@@ -5,7 +5,7 @@ on:
 
 
 jobs:
-  deploy-redis-to-ECR:
+  deploy-rds-to-ECR:
     runs-on: ubuntu-latest
 
     env:
@@ -41,7 +41,7 @@ jobs:
           docker tag backend_rds:latest ${{ secrets.ECR_RDS }}:latest
           docker push ${{ secrets.ECR_RDS }}:latest
 
-      - name: Deploy Redis to ECS
+      - name: Deploy RDS to ECS
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
