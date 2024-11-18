@@ -7,7 +7,7 @@ COPY requirements.txt /app
 RUN pip install --upgrade pip
 
 RUN pip install --no-cache-dir -r requirements.txt
-#test
+#test2
 COPY . /app
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
