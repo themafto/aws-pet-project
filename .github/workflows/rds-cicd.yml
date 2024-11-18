@@ -1,0 +1,48 @@
+on:
+  push:
+    paths:
+      - 'backend_rds/**'
+
+
+jobs:
+  deploy-redis-to-ECR:
+    runs-on: ubuntu-latest
+
+    env:
+      CLUSTER_NAME: project2-v1
+      RDS_SERVICE_NAME: rds
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Connect to ECR
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+
+
+      - name: build and push
+        run: |
+          docker build -t backend_rds:latest -f backend_rds/Dockerfile backend_rds
+          docker tag backend_rds:latest ${{ secrets.ECR_RDS }}:latest
+          docker push ${{ secrets.ECR_RDS }}:latest
+
+      - name: Deploy Redis to ECS
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws ecs update-service --cluster $CLUSTER_NAME --service $RDS_SERVICE_NAME --force-new-deployment
